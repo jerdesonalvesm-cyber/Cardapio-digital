@@ -366,16 +366,20 @@
                         <input type="text" id="cliente-nome" placeholder="Digite seu nome" class="w-full px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/50">
                     </div>
                     
-                    <!-- Campo de Endereço + Calculadora de Frete -->
+                    <!-- Campo de Endereço + Botão de GPS Automático -->
                     <div id="campo-endereco">
-                        <label class="block text-xs font-bold text-gray-700 mb-1">Seu Endereço Completo *</label>
-                        <div class="flex gap-2">
-                            <input type="text" id="cliente-endereco" placeholder="Ex: Rua Vergueiro 1000, São Paulo" class="flex-1 px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/50">
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Seu Endereço ou GPS *</label>
+                        <div class="flex gap-2 mb-1">
+                            <input type="text" id="cliente-endereco" placeholder="Digite seu endereço ou clique em GPS" class="flex-1 px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/50">
                             <button type="button" onclick="calcularFretePorEndereco()" class="bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold px-3 py-2 rounded-xl shrink-0 transition flex items-center gap-1">
                                 <i class="ph ph-calculator"></i> Frete
                             </button>
                         </div>
-                        <p id="frete-status" class="text-xs mt-1 text-gray-500">Digite o endereço e clique em 'Frete'.</p>
+                        <button type="button" onclick="obrigarLocalizacaoGPS()" class="w-full bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300 text-xs font-bold py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 transition">
+                            <i class="ph ph-crosshair text-base"></i>
+                            <span>Usar minha Localização Atual (GPS)</span>
+                        </button>
+                        <p id="frete-status" class="text-xs mt-1 text-gray-500">Clique em GPS ou digite o endereço.</p>
                     </div>
 
                     <div>
@@ -658,6 +662,48 @@
             return R * c;
         }
 
+        function obrigarLocalizacaoGPS() {
+            const status = document.getElementById('frete-status');
+
+                    if (!navigator.geolocation) {
+                status.innerText = "⚠️ Seu navegador não suporta geolocalização.";
+                status.className = "text-xs mt-1 text-red-500 font-medium";
+                return;
+            }
+
+            status.innerText = "⏳ Solicitando permissão de GPS...";
+            status.className = "text-xs mt-1 text-amber-600 font-medium";
+
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    const clienteLat = position.coords.latitude;
+                    const clienteLon = position.coords.longitude;
+
+                    const km = calcularDistanciaHaversine(LOJA_LAT, LOJA_LON, clienteLat, clienteLon);
+                    distanciaCalculadaKm = Math.max(0.5, km).toFixed(1);
+
+                    if (distanciaCalculadaKm <= 2.0) {
+                        taxaEntregaCalculada = 3.00;
+                    } else {
+                        const kmExtra = distanciaCalculadaKm - 2.0;
+                        taxaEntregaCalculada = 3.00 + (kmExtra * 2.00);
+                    }
+
+                    document.getElementById('cliente-endereco').value = `Localização via GPS (~${distanciaCalculadaKm} km da loja)`;
+
+                    status.innerHTML = `✅ GPS obtido com sucesso! Distância: <b>${distanciaCalculadaKm} km</b> • Frete: <b>R$ ${taxaEntregaCalculada.toFixed(2).replace('.', ',')}</b>`;
+                    status.className = "text-xs mt-1 text-emerald-600 font-medium";
+
+                    calcularResumoValores();
+                },
+                (error) => {
+                    status.innerText = "⚠️ Permissão de GPS negada ou indisponível. Digite o endereço manualmente.";
+                    status.className = "text-xs mt-1 text-red-500 font-medium";
+                },
+                { timeout: 10000, enableHighAccuracy: true }
+            );
+        }
+
         async function calcularFretePorEndereco() {
             const endereco = document.getElementById('cliente-endereco').value.trim();
             const status = document.getElementById('frete-status');
@@ -671,7 +717,7 @@
             status.innerText = "⏳ Buscando endereço e calculando frete...";
             status.className = "text-xs mt-1 text-amber-600 font-medium";
 
-                        try {
+            try {
                 const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(endereco)}`);
                 const data = await response.json();
 
@@ -799,7 +845,7 @@
             const endereco = document.getElementById('cliente-endereco').value.trim();
 
             if(tipoEntrega === 'delivery' && !endereco) {
-                alert("Por favor, informe o endereço de entrega.");
+                alert("Por favor, informe o endereço ou utilize o GPS.");
                 return;
             }
 
@@ -813,7 +859,7 @@
             msg += `🛵 *Tipo:* ${tipoEntrega === 'delivery' ? 'Entrega (Delivery)' : 'Retirada no Balcão'}\n`;
             
             if(tipoEntrega === 'delivery') {
-                msg += `📍 *Endereço:* ${endereco}\n`;
+                msg += `📍 *Endereço / Local:* ${endereco}\n`;
                 msg += `📏 *Distância:* ~${distanciaCalculadaKm} km\n`;
             }
 
@@ -871,5 +917,3 @@
 </script>
 </body>
 </html>
-
-  

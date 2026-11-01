@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sabor & Tradição - Cardápio Digital</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: 'var(--color-brand-50, #fef2f2)',
+                            100: 'var(--color-brand-100, #ffe1e1)',
+                            500: 'var(--color-brand-500, #ef4444)',
+                            600: 'var(--color-brand-600, #dc2626)',
+                            700: 'var(--color-brand-700, #b91c1c)',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --color-brand-50: #fef2f2;
+            --color-brand-100: #ffe1e1;
+            --color-brand-500: #ef4444;
+            --color-brand-600: #dc2626;
+            --color-brand-700: #b91c1c;
+        }
+        .theme-burger {
+            --color-brand-50: #fffbeb;
+            --color-brand-100: #fef3c7;
+            --color-brand-500: #f59e0b;
+            --color-brand-600: #d97706;
+            --color-brand-700: #b45309;
+        }
+        .theme-green {
+            --color-brand-50: #f0fdf4;
+            --color-brand-100: #dcfce7;
+            --color-brand-500: #22c55e;
+            --color-brand-600: #16a34a;
+            --color-brand-700: #15803d;
+        }
+        .theme-dark {
+            --color-brand-50: #f5f3ff;
+            --color-brand-100: #ede9fe;
+            --color-brand-500: #8b5cf6;
+            --color-brand-600: #7c3aed;
+            --color-brand-700: #6d28d9;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 min-h-full flex flex-col font-sans pb-28">
+
+    <!-- Top Admin Bar (Painel de Demonstração) -->
+    <div class="bg-gray-900 text-white text-xs py-2 px-4 flex flex-wrap justify-between items-center gap-2">
+        <div class="flex items-center gap-2">
+            <i class="ph ph-gear text-brand-500 text-base"></i>
+            <span class="font-medium">Painel de Demonstração:</span>
+        </div>
+        <div class="flex items-center gap-3">
+            <div class="flex items-center gap-1">
+                <label for="whatsapp-number" class="text-gray-400">Zap:</label>
+                <input type="text" id="whatsapp-number" value="5511913403143" class="bg-gray-800 text-white px-2 py-0.5 rounded border border-gray-700 text-xs w-32 focus:outline-none focus:border-brand-500">
+            </div>
+            <div class="flex items-center gap-1">
+                <span class="text-gray-400">Tema:</span>
+                <button onclick="setTheme('')" class="w-4 h-4 rounded-full bg-red-600 border border-white/20" title="Vermelho Tradicional"></button>
+                <button onclick="setTheme('theme-burger')" class="w-4 h-4 rounded-full bg-amber-500 border border-white/20" title="Amarelo Burger"></button>
+                <button onclick="setTheme('theme-green')" class="w-4 h-4 rounded-full bg-emerald-600 border border-white/20" title="Verde Artesanal"></button>
+                <button onclick="setTheme('theme-dark')" class="w-4 h-4 rounded-full bg-purple-600 border border-white/20" title="Roxo Premium"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header Banner -->
+    <header class="bg-brand-600 text-white transition-colors duration-300">
+        <div
+          
